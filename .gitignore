@@ -1,0 +1,77 @@
+# ========================
+# Python
+# ========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+*.so
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# ========================
+# Jupyter Notebook
+# ========================
+.ipynb_checkpoints/
+
+# ========================
+# LaTeX 编译产物
+# ========================
+*.aux
+*.log
+*.synctex.gz
+*.synctex(busy)
+*.fdb_latexmk
+*.fls
+*.out
+*.toc
+*.lof
+*.lot
+*.bbl
+*.blg
+*.nav
+*.snm
+*.vrb
+*.bcf
+*.run.xml
+*.xdv
+*.tex
+*.sty
+
+# 不忽略 report PDF（要提交的）
+# !report/report.pdf
+
+# ========================
+# 模型权重（大文件，传 Google Drive）
+# ========================
+save_models/
+*.npz
+
+# ========================
+# 数据集（运行时自动下载）
+# ========================
+data/
+*.gz
+
+# ========================
+# OS 生成的文件
+# ========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ========================
+# IDE / 编辑器
+# ========================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

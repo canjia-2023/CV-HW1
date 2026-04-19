@@ -1,0 +1,13 @@
+name: fashion-mnist
+channels:
+  - defaults
+dependencies:
+  - python=3.10
+  - numpy
+  - matplotlib
+  - ipykernel # Jupyter notebook便于展示
+  - pip
+  - pip:
+    - tensorflow  # 仅用于下载 Fashion-MNIST 数据集
+    - scikit-learn  # 用于混淆矩阵
+    - seaborn  # 用于混淆矩阵热力图
