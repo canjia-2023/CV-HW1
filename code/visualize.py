@@ -40,15 +40,71 @@ def _load_model(path='save_models/best_model.npz'):
     return model
 
 
+# def plot_training_curves(history, lr_decay_epochs=None,
+#                          save_path='figures/training_curves.png'):
+#     """
+#     Train-loss (left) and val-accuracy (right) side by side.
+
+#     Parameters
+#     ----------
+#     history : dict  {'train_loss': [...], 'val_acc': [...]}
+#     lr_decay_epochs : list[int], optional  1-indexed epochs where LR was decayed
+#     """
+#     epochs     = list(range(1, len(history['train_loss']) + 1))
+#     best_epoch = int(np.argmax(history['val_acc'])) + 1
+#     best_acc   = float(max(history['val_acc']))
+
+#     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13, 5), facecolor=_BG)
+#     _setup_ax(ax1)
+#     _setup_ax(ax2)
+
+#     # Loss
+#     ax1.plot(epochs, history['train_loss'], color=_BLUE, linewidth=2,
+#              marker='o', markersize=4, label='Train Loss')
+
+#     # Accuracy
+#     ax2.plot(epochs, history['val_acc'], color=_GREEN, linewidth=2,
+#              marker='s', markersize=4, label='Val Accuracy')
+#     ax2.scatter([best_epoch], [best_acc], color=_AMBER, s=120, zorder=5,
+#                 label=f'Best: {best_acc:.2%} @ ep{best_epoch}')
+#     ax2.annotate(f'{best_acc:.2%}',
+#                  xy=(best_epoch, best_acc),
+#                  xytext=(best_epoch + 0.4, best_acc - 0.012),
+#                  fontsize=9, color=_AMBER, fontweight='bold')
+
+#     if lr_decay_epochs:
+#         labeled = False
+#         for ax in (ax1, ax2):
+#             for e in lr_decay_epochs:
+#                 kw = dict(color=_AMBER, linewidth=1.2, linestyle='--', alpha=0.6, zorder=2)
+#                 if not labeled:
+#                     kw['label'] = 'LR Decay'
+#                     labeled = True
+#                 ax.axvline(e, **kw)
+
+#     for ax, title, ylabel in [
+#         (ax1, 'Training Loss',       'Loss'),
+#         (ax2, 'Validation Accuracy', 'Accuracy'),
+#     ]:
+#         ax.set_xlabel('Epoch', fontsize=11)
+#         ax.set_ylabel(ylabel,  fontsize=11)
+#         ax.set_title(title, fontsize=13, fontweight='bold')
+#         ax.legend(fontsize=10)
+
+#     ax2.set_ylim(max(0.0, min(history['val_acc']) - 0.05), 1.02)
+#     ax2.yaxis.set_major_formatter(mticker.FuncFormatter(lambda y, _: f'{y:.0%}'))
+
+#     plt.suptitle('Training Curves', fontsize=15, fontweight='bold', y=1.02)
+#     plt.tight_layout()
+#     plt.savefig(save_path, dpi=150, bbox_inches='tight', facecolor=_BG)
+#     plt.show()
+#     print(f'Saved: {save_path}')
+
 def plot_training_curves(history, lr_decay_epochs=None,
                          save_path='figures/training_curves.png'):
     """
-    Train-loss (left) and val-accuracy (right) side by side.
-
-    Parameters
-    ----------
-    history : dict  {'train_loss': [...], 'val_acc': [...]}
-    lr_decay_epochs : list[int], optional  1-indexed epochs where LR was decayed
+    Left:  Train Loss + Val Loss
+    Right: Val Accuracy
     """
     epochs     = list(range(1, len(history['train_loss']) + 1))
     best_epoch = int(np.argmax(history['val_acc'])) + 1
@@ -58,11 +114,13 @@ def plot_training_curves(history, lr_decay_epochs=None,
     _setup_ax(ax1)
     _setup_ax(ax2)
 
-    # Loss
+    # Left: Loss
     ax1.plot(epochs, history['train_loss'], color=_BLUE, linewidth=2,
              marker='o', markersize=4, label='Train Loss')
+    ax1.plot(epochs, history['val_loss'], color='#EF4444', linewidth=2,
+             marker='D', markersize=4, label='Val Loss')
 
-    # Accuracy
+    # Right: Accuracy
     ax2.plot(epochs, history['val_acc'], color=_GREEN, linewidth=2,
              marker='s', markersize=4, label='Val Accuracy')
     ax2.scatter([best_epoch], [best_acc], color=_AMBER, s=120, zorder=5,
@@ -72,19 +130,21 @@ def plot_training_curves(history, lr_decay_epochs=None,
                  xytext=(best_epoch + 0.4, best_acc - 0.012),
                  fontsize=9, color=_AMBER, fontweight='bold')
 
+    # LR decay vertical lines
     if lr_decay_epochs:
         labeled = False
         for ax in (ax1, ax2):
             for e in lr_decay_epochs:
-                kw = dict(color=_AMBER, linewidth=1.2, linestyle='--', alpha=0.6, zorder=2)
+                kw = dict(color=_AMBER, linewidth=1.2, linestyle='--',
+                          alpha=0.6, zorder=2)
                 if not labeled:
                     kw['label'] = 'LR Decay'
                     labeled = True
                 ax.axvline(e, **kw)
 
     for ax, title, ylabel in [
-        (ax1, 'Training Loss',       'Loss'),
-        (ax2, 'Validation Accuracy', 'Accuracy'),
+        (ax1, 'Training / Validation Loss', 'Loss'),
+        (ax2, 'Validation Accuracy',        'Accuracy'),
     ]:
         ax.set_xlabel('Epoch', fontsize=11)
         ax.set_ylabel(ylabel,  fontsize=11)
@@ -92,7 +152,8 @@ def plot_training_curves(history, lr_decay_epochs=None,
         ax.legend(fontsize=10)
 
     ax2.set_ylim(max(0.0, min(history['val_acc']) - 0.05), 1.02)
-    ax2.yaxis.set_major_formatter(mticker.FuncFormatter(lambda y, _: f'{y:.0%}'))
+    ax2.yaxis.set_major_formatter(
+        mticker.FuncFormatter(lambda y, _: f'{y:.0%}'))
 
     plt.suptitle('Training Curves', fontsize=15, fontweight='bold', y=1.02)
     plt.tight_layout()
@@ -262,10 +323,9 @@ def plot_per_class_accuracy(y_true, y_pred,
 if __name__ == '__main__':
     from train import train
 
-    _, history = train(
-        hidden_dim1=256, hidden_dim2=128, lr=0.1,
-        weight_decay=1e-4, epochs=20, activation='relu',
-        step_size=5, gamma=0.5
+    _, history = train(hidden_dim1=1024,hidden_dim2=256,lr=0.2,
+          weight_decay=0,epochs=30,activation='relu',
+          step_size=5,gamma=0.5
     )
     plot_training_curves(history, lr_decay_epochs=[5, 10, 15])
 

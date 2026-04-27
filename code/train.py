@@ -22,7 +22,7 @@ def train(hidden_dim1=256,hidden_dim2=128,lr=0.1,weight_decay=1e-4,
     batch_size = 64
     N = X_train.shape[0]
     best_val_acc = 0
-    history = {'train_loss': [], 'val_acc': []}
+    history = {'train_loss': [], 'val_loss': [], 'val_acc': []}
 
 
     for epoch in range(epochs):
@@ -60,13 +60,15 @@ def train(hidden_dim1=256,hidden_dim2=128,lr=0.1,weight_decay=1e-4,
 
         # Acc in validation set
         out = model.forward(X_val)
+        val_loss = criterion.forward(out, y_val)
         predictions = np.argmax(out, axis=1)
         acc = np.mean(predictions == y_val)
 
         history['train_loss'].append(avg_loss)
+        history['val_loss'].append(val_loss)
         history['val_acc'].append(acc)
 
-        print(f"Epoch {epoch+1}/{epochs}  Loss: {avg_loss:.4f}  Val Acc: {acc:.4f}")
+        print(f"Epoch {epoch+1}/{epochs}  Loss: {avg_loss:.4f}  Val Loss: {val_loss:.4f}  Val Acc: {acc:.4f}")
 
         if acc > best_val_acc:
             best_val_acc = acc
@@ -79,5 +81,6 @@ def train(hidden_dim1=256,hidden_dim2=128,lr=0.1,weight_decay=1e-4,
     return best_val_acc, history
 
 if __name__ == '__main__':
-    train(hidden_dim1=512,hidden_dim2=128,lr=0.1,weight_decay=0,
-          epochs=10,activation='relu',step_size=5,gamma=0.5)
+    train(hidden_dim1=1024,hidden_dim2=256,lr=0.2,        
+        weight_decay=0,epochs=30,activation='relu',
+        step_size=5,gamma=0.5)
